@@ -18,16 +18,14 @@ class PlayerWithControls extends StatelessWidget {
       child: Container(
         width: MediaQuery.of(context).size.width,
         child: AspectRatio(
-          aspectRatio:
-              chewieController.aspectRatio ?? _calculateAspectRatio(context),
+          aspectRatio: chewieController.aspectRatio ?? _calculateAspectRatio(context),
           child: _buildPlayerWithControls(chewieController, context),
         ),
       ),
     );
   }
 
-  Container _buildPlayerWithControls(
-      ChewieController chewieController, BuildContext context) {
+  Container _buildPlayerWithControls(ChewieController chewieController, BuildContext context) {
     return Container(
       child: Stack(
         children: <Widget>[
@@ -36,8 +34,7 @@ class PlayerWithControls extends StatelessWidget {
             child: Hero(
               tag: chewieController.videoPlayerController,
               child: AspectRatio(
-                aspectRatio: chewieController.aspectRatio ??
-                    _calculateAspectRatio(context),
+                aspectRatio: chewieController.aspectRatio ?? _calculateAspectRatio(context),
                 child: VideoPlayer(chewieController.videoPlayerController),
               ),
             ),
@@ -49,20 +46,16 @@ class PlayerWithControls extends StatelessWidget {
     );
   }
 
-  Widget _buildControls(
-    BuildContext context,
-    ChewieController chewieController,
-  ) {
+  Widget _buildControls(BuildContext context, ChewieController chewieController) {
     return chewieController.showControls
-        ? chewieController.customControls != null
-            ? chewieController.customControls
-            : Theme.of(context).platform == TargetPlatform.android
-                ? MaterialControls()
-                : CupertinoControls(
-                    backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-                    iconColor: Color.fromARGB(255, 200, 200, 200),
-                  )
-        : Container();
+        ? chewieController.customControls != null ? chewieController.customControls : MaterialControls()
+//            : Theme.of(context).platform == TargetPlatform.android
+//                ? MaterialControls()
+//                : CupertinoControls(
+//                    backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+//                    iconColor: Color.fromARGB(255, 200, 200, 200),
+//                  )
+        : Container(color: Colors.black);
   }
 
   double _calculateAspectRatio(BuildContext context) {
