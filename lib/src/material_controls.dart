@@ -27,6 +27,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   bool _isInitComplete = false; // 是否正初始化完成
   bool _isLoadBuffer = false; // 是否正在加载缓存
+  int _loadCount = 0; // 加载缓存判断次数，累计5次以上，正在加载
   bool _isPlayComplete = false; //是否播放完成
 
   final barHeight = 48.0;
@@ -260,17 +261,14 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   GestureDetector _buildExpandButton() {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: _onExpandCollapse,
       child: AnimatedOpacity(
         opacity: _hideStuff ? 0.0 : 1.0,
         duration: Duration(milliseconds: 300),
         child: Container(
           height: barHeight,
-          margin: EdgeInsets.only(right: 12.0),
-          padding: EdgeInsets.only(
-            left: 5.0,
-            right: 5.0,
-          ),
+          padding: EdgeInsets.only(left: 6.0, right: 12.0),
           child: Center(
             child: Icon(
               chewieController.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
@@ -284,6 +282,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   GestureDetector _buildMuteButton(VideoPlayerController controller) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         _cancelAndRestartTimer();
 
@@ -299,16 +298,11 @@ class _MaterialControlsState extends State<MaterialControls> {
         duration: Duration(milliseconds: 300),
         child: ClipRect(
           child: Container(
-            child: Container(
-              height: barHeight,
-              padding: EdgeInsets.only(
-                left: 5.0,
-                right: 5.0,
-              ),
-              child: Icon(
-                (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
-                color: Colors.white,
-              ),
+            height: barHeight,
+            padding: EdgeInsets.only(left: 12.0, right: 6.0),
+            child: Icon(
+              (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
+              color: Colors.white,
             ),
           ),
         ),
@@ -318,17 +312,13 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   GestureDetector _buildPlayPause(VideoPlayerController controller) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         _playPause();
       },
       child: Container(
         height: barHeight,
-        color: Colors.transparent,
-        margin: EdgeInsets.only(left: 8.0, right: 4.0),
-        padding: EdgeInsets.only(
-          left: 8.0,
-          right: 8.0,
-        ),
+        width: barHeight,
         child: Icon(
           controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
           color: Colors.white,
@@ -341,11 +331,13 @@ class _MaterialControlsState extends State<MaterialControls> {
     final position = _latestValue != null && _latestValue.position != null ? _latestValue.position : Duration.zero;
     final duration = _latestValue != null && _latestValue.duration != null ? _latestValue.duration : Duration.zero;
 
-    return Padding(
-      padding: EdgeInsets.only(right: 10.0),
-      child: Text(
-        '${formatDuration(position)} / ${formatDuration(duration)}',
-        style: TextStyle(fontSize: 14.0, color: Colors.white),
+    return Container(
+      height: barHeight,
+      child: Center(
+        child: Text(
+          '${formatDuration(position)} / ${formatDuration(duration)}',
+          style: TextStyle(fontSize: 14.0, color: Colors.white),
+        ),
       ),
     );
   }
@@ -425,15 +417,21 @@ class _MaterialControlsState extends State<MaterialControls> {
       if (playerValue.duration != null) {
         _isInitComplete = true;
       }
-      //TODO  判断是否加载进度中 显示时间机制不对
+      // 判断是否在加载中
       _isLoadBuffer = false;
-//      if (playerValue.isPlaying) {
-//        if (playerValue.buffered.length != 0 && playerValue.duration >= playerValue.buffered[0].end) {
-//          if (playerValue.position == _latestValue?.position) {
-//            _isLoadBuffer = true;
-//          }
-//        }
-//      }
+      if (playerValue.isPlaying) {
+        if (playerValue.buffered.length != 0 && playerValue.duration >= playerValue.buffered[0].end) {
+          if (playerValue.position == _latestValue?.position) {
+            _loadCount++;
+            if (_loadCount >= 4) {
+              _isLoadBuffer = true;
+            }
+          } else {
+            // 清空累计次数
+            _loadCount = 0;
+          }
+        }
+      }
       // 判断是否播放完成
       if (!playerValue.isLooping && playerValue.duration != null) {
         if (playerValue.position >= playerValue.duration) {
@@ -448,7 +446,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   Widget _buildProgressBar() {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(right: 10.0),
+        padding: EdgeInsets.only(left: 14.0),
         child: MaterialVideoProgressBar(
           controller,
           onDragStart: () {

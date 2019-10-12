@@ -30,16 +30,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   void initState() {
     super.initState();
-//    _videoPlayerController1 =
-//        VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
-    _videoPlayerController1 = VideoPlayerController.asset(
-      'assets/1548390528490.mp4',
-    );
+    _videoPlayerController1 =
+        VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+//    _videoPlayerController1 = VideoPlayerController.asset(
+//      'assets/1548390528490.mp4'
+//    );
     _videoPlayerController2 =
         VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController1,
-      aspectRatio: 544 / 960,
+      aspectRatio: 4 / 3,
       autoPlay: false,
       looping: false,
       autoInitialize: true,
